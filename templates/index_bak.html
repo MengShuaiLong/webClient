@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .upload-form {
+            margin-bottom: 20px;
+        }
+        .file-input {
+            margin-bottom: 10px;
+        }
+        .submit-button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .uploaded-files {
+            margin-top: 20px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .file-name {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .download-link {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .download-link:hover {
+            text-decoration: underline;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress {
+            width: 0%;
+            height: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>文件上传</h1>
+    {% if success_message %}
+        <div style="color: green; margin-bottom: 20px;">{{ success_message }}</div>
+    {% endif %}
+    
+    <div class="upload-container">
+        <h2>上传文件</h2>
+        <form class="upload-form" id="uploadForm" method="POST" enctype="multipart/form-data">
+            <div class="file-input">
+                <input type="file" name="file" required>
+            </div>
+            <button class="submit-button" type="submit">上传</button>
+        </form>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar">0%</div>
+        </div>
+    </div>
+    
+    <div class="uploaded-files">
+        <h2>已上传的文件</h2>
+        {% if files %}
+            <ul>
+                {% for file in files %}
+                    <li class="file-item">
+                        <span class="file-name">{{ file }}</span>
+                        <a class="download-link" href="{{ url_for('uploaded_file', filename=file) }}">下载</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>暂无上传文件</p>
+        {% endif %}
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const progressBar = document.getElementById('progressBar');
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', '/', true);
+
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressBar.style.width = percentComplete + '%';
+                    progressBar.textContent = Math.round(percentComplete) + '%';
+                }
+            });
+
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 200) {
+                    window.location.reload();
+                } else {
+                    alert('上传失败: ' + xhr.responseText);
+                }
+            });
+
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>    

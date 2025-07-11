@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROCKAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF6600',
+            secondary: '#2D3748',
+            neutral: '#F7FAFC',
+            'neutral-dark': '#1A202C',
+            'primary-light': '#FFE9DB',
+            'sidebar-bg': '#1E293B',
+            'sidebar-hover': '#2D3748',
+            'sidebar-active': '#FF6600',
+            // 新增按钮颜色
+            'button-primary': '#FF6600',
+            'button-primary-hover': '#E65C00',
+
+            'button-primary-disabled': '#FFA366',
+            // 新增炫彩颜色
+            'neon-pink': '#FF00FF',
+            'neon-blue': '#00FFFF',
+            'neon-green': '#00FF00',
+            'neon-yellow': '#FFFF00',
+            'neon-orange': '#FFA500',
+            'neon-purple': '#800080'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          backgroundImage: {
+            // 自定义渐变色
+            'gradient-pink-blue': 'linear-gradient(45deg, #FF00FF, #00FFFF)',
+            'gradient-green-yellow': 'linear-gradient(45deg, #00FF00, #FFFF00)',
+            'gradient-orange-purple': 'linear-gradient(45deg, #FFA500, #800080)'
+          }
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .sidebar-gradient {
+        background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+      }
+      .nav-item-active {
+        @apply bg-sidebar-active text-white border-l-4 border-white/30;
+      }
+      .nav-item-hover {
+        @apply hover:bg-sidebar-hover hover:text-white transition-all duration-200;
+      }
+      .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      /* 添加子导航项展开收缩样式 */
+      .sub-nav {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+      .sub-nav.open {
+        max-height: 500px; /* 可根据实际子导航项数量调整 */
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+  <div class="flex flex-1 overflow-hidden">
+    <!-- 侧边栏导航 - 固定显示，带颜色渲染 -->
+    <aside class="w-64 sidebar-gradient text-white shadow-lg fixed top-0 bottom-0 left-0 z-30">
+      <div class="flex flex-col h-full">
+        <!-- 侧边栏头部 -->
+        <div class="p-4 border-b border-gray-700 flex items-center">
+          <img src="https://picsum.photos/40/40" alt="MIIVII Logo" class="h-10 w-10 rounded-md border-2 border-primary">
+          <div class="ml-3">
+            <h1 class="text-lg font-semibold">ROCKAI</h1>
+            <p class="text-xs text-gray-400">版本: 1.0.0</p>
+          </div>
+        </div>
+        
+        <!-- 导航菜单 -->
+        <nav class="flex-1 overflow-y-auto py-4">
+          <ul class="px-2">
+            <li class="mb-1">
+              <a href="#dashboard" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                <i class="fa fa-tachometer w-6"></i>
+                <span class="ml-3">系统状态</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <!-- 添加 data-toggle-subnav 属性 -->
+              <a href="#settings" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover" data-toggle-subnav>
+                <i class="fa fa-cog w-6"></i>
+                <span class="ml-3">系统设置</span>
+                <!-- 添加展开收缩图标 -->
+                <i class="fa fa-chevron-down ml-auto text-sm"></i>
+              </a>
+              <!-- 子导航项添加 sub-nav 类 -->
+              <ul class="ml-8 sub-nav">
+                <li class="mb-1">
+                  <a href="#settings-sub1" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                    <i class="fa fa-angle-right w-6"></i>
+                    <span class="ml-3">通信模块</span>
+                  </a>
+                </li>
+                <li class="mb-1">
+                  <a href="#settings-sub2" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                    <i class="fa fa-angle-right w-6"></i>
+                    <span class="ml-3">感知模块</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="mb-1">
+              <a href="#upgrade" class="nav-item nav-item-active flex items-center px-4 py-3 rounded-lg">
+                <i class="fa fa-refresh w-6"></i>
+                <span class="ml-3">系统升级</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="#logs" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                <i class="fa fa-file-text-o w-6"></i>
+                <span class="ml-3">日志导出</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="flex-1 overflow-y-auto bg-gray-50 ml-64">
+      <!-- 顶部操作栏 -->
+      <div class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900">系统升级</h2>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <button class="flex items-center text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                <span class="mr-1">中文</span>
+                <i class="fa fa-chevron-down text-xs"></i>
+              </button>
+            </div>
+            <button class="text-gray-700 hover:text-gray-900 transition-colors duration-200">
+              <i class="fa fa-question-circle"></i>
+            </button>
+            <button class="text-gray-700 hover:text-gray-900 transition-colors duration-200">
+              <i class="fa fa-bell"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 内容区域 -->
+      <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- 系统升级内容 -->
+        <div id="upgrade-content" class="fade-in">
+          <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">升级车辆信息</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="upgrade-cars-grid">
+              <!-- 车辆信息将通过 JavaScript 动态生成 -->
+            </div>
+          </div>
+        </div>
+        <!-- 其他内容区域（默认隐藏） -->
+        <div id="dashboard-content" class="hidden fade-in">
+          <!-- 系统状态内容 -->
+          <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">系统状态概览</h3>
+            <!-- 状态卡片内容 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-blue-50 rounded-lg p-4 border border-blue-100 transform hover:scale-[1.02] transition-all duration-300">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="fa fa-microchip text-blue-500 text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-blue-700">CPU 使用率</p>
+                    <p class="text-2xl font-semibold text-gray-900">25%</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-green-50 rounded-lg p-4 border border-green-100 transform hover:scale-[1.02] transition-all duration-300">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <i class="fa fa-memory text-green-500 text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-green-700">内存使用率</p>
+                    <p class="text-2xl font-semibold text-gray-900">40%</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-orange-50 rounded-lg p-4 border border-orange-100 transform hover:scale-[1.02] transition-all duration-300">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-orange-100 p-3 rounded-lg">
+                    <i class="fa fa-hdd-o text-orange-500 text-xl"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-orange-700">磁盘使用率</p>
+                    <p class="text-2xl font-semibold text-gray-900">65%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 其他内容区域可以继续添加 -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 确保 selectedFiles 对象在全局作用域中定义
+    const selectedFiles = {};
+    // 定义 upgradeStatus 对象，用于记录每辆车的升级状态
+    const upgradeStatus = {};
+    // 初始化空的车辆数组
+    const cars = [];
+    // 用于记录每辆车最后一次收到在线数据的时间
+    const lastOnlineTime = {};
+
+    // 驾驶模式图标映射
+    const modeIcons = {
+      '人工驾驶': 'fa-user', // 用用户图标代表人工驾驶
+      '自动驾驶': 'fa-cog', // 用齿轮图标代表自动模式
+      '遥控驾驶': 'fa-robot' // 用游戏手柄图标代表遥控模式
+    };
+
+    // 档位图标映射
+    const gearIcons = {
+      '未知': 'fa-question-circle', // 用问号图标表示未知档位
+      'N': 'fa-circle-o', // 用空心圆圈表示中立、无驱动状态，适用于 N 档
+      '1': 'fa-sort-numeric-asc', // 数字 1 通常表示起始、最低档，用数字排序图标
+      '2': 'fa-sort-numeric-asc', 
+      '3': 'fa-sort-numeric-asc', 
+      '4': 'fa-sort-numeric-asc', 
+      '5': 'fa-sort-numeric-asc', 
+      '6': 'fa-sort-numeric-asc', 
+      '7': 'fa-sort-numeric-asc', 
+      'R': 'fa-backward', // 用向后图标表示倒车档
+      'P': 'fa-parking' // 用停车图标表示停车档
+    };
+
+    // 预设车辆格子颜色，增加更多颜色选项
+    const carColors = [
+      'bg-blue-50 border-blue-200',
+      'bg-green-50 border-green-200',
+      'bg-orange-50 border-orange-200',
+      'bg-purple-50 border-purple-200',
+      'bg-teal-50 border-teal-200',
+      'bg-yellow-50 border-yellow-200',
+      'bg-pink-50 border-pink-200',
+      'bg-indigo-50 border-indigo-200',
+      'bg-cyan-50 border-cyan-200',
+      'bg-lime-50 border-lime-200'
+    ];
+    // const carColors = [
+    //   'bg-gray-100 border-gray-200', // 浅灰色，模拟柔和反射
+    //   'bg-slate-100 border-slate-200', // 浅石板色，营造沉稳质感
+    //   'bg-zinc-100 border-zinc-200', // 浅锌色，带来柔和视觉感受
+    //   'bg-stone-100 border-stone-200', // 浅石色，展现自然质感
+    //   'bg-blue-100 border-blue-200', // 浅蓝色，体现清新柔和
+    //   'bg-cyan-100 border-cyan-200', // 浅青色，带来柔和的清凉感
+    //   'bg-teal-100 border-teal-200', // 浅蓝绿色，呈现柔和的生机感
+    //   'bg-lime-100 border-lime-200', // 浅酸橙色，模拟温暖的漫反射
+    //   'bg-emerald-100 border-emerald-200', // 浅翡翠绿，展现柔和的自然色
+    //   'bg-amber-100 border-amber-200' // 浅琥珀色，带来柔和的温暖色调
+    // ];
+
+    // 创建车辆信息 HTML 结构
+    function createCarInfoHTML(car, index) {
+      const colorClass = carColors[index % carColors.length];
+      return `
+        <div class="rounded-lg p-4 ${colorClass} transform hover:scale-[1.02] transition-all duration-300 relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <i class="fa fa-car text-gray-600 text-2xl mr-3"></i>
+              <h4 class="text-lg font-medium text-gray-800">车辆 - ${car.imei}</h4>
+            </div>
+            <!-- 在线标志 -->
+            <div id="car-${car.imei}-online-status" class="bg-gray-400 w-3 h-3 rounded-full"></div>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <!-- 车速信息 -->
+            <div class="flex items-center py-2 border-b border-gray-200">
+              <div class="flex-shrink-0 bg-blue-100 p-2 rounded-lg">
+                <i class="fa fa-tachometer text-blue-500 text-lg"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-600">当前车速</p>
+                <p class="text-lg font-semibold text-gray-800" id="upgrade-car-${car.imei}-speed">${car.speed}</p>
+                <span class="text-gray-500 ml-1 text-sm">km/h</span>
+              </div>
+            </div>
+            <!-- 驾驶模式信息 -->
+            <div class="flex items-center py-2 border-b border-gray-200">
+              <div class="flex-shrink-0 bg-orange-100 p-2 rounded-lg">
+                <i class="fa ${modeIcons[car.mode]} text-orange-500 text-lg"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-600">驾驶模式</p>
+                <p class="text-lg font-semibold text-gray-800" id="upgrade-car-${car.imei}-mode">${car.mode}</p>
+              </div>
+            </div>
+            <!-- 档位信息 -->
+            <div class="flex items-center py-2 border-b border-gray-200">
+              <div class="flex-shrink-0 bg-green-100 p-2 rounded-lg">
+                <i class="fa ${gearIcons[car.gear]} text-green-500 text-lg"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-600">档位</p>
+                <p class="text-lg font-semibold text-gray-800" id="upgrade-car-${car.imei}-gear">${car.gear}</p>
+              </div>
+            </div>
+            <!-- 版本号信息 -->
+            <div class="flex items-center py-2 border-b border-gray-200">
+              <div class="flex-shrink-0 bg-purple-100 p-2 rounded-lg">
+                <i class="fa fa-code-fork text-purple-500 text-lg"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-600">版本号</p>
+                <p class="text-lg font-semibold text-gray-800" id="upgrade-car-${car.imei}-version">${car.version}</p>
+              </div>
+            </div>
+          </div>
+          <!-- 本地文件和开始升级按钮 -->
+          <div class="mt-4 flex justify-between">
+            <label for="file-input-${car.imei}" class="bg-button-primary text-white px-4 py-2 rounded-md cursor-pointer hover:bg-button-primary-hover transition-colors flex items-center">
+              <i class="fa fa-folder-open mr-2"></i> 选择文件
+            </label>
+            <input type="file" id="file-input-${car.imei}" class="hidden" onchange="handleFileSelect(event, '${car.imei}')">
+            <button 
+              id="start-upgrade-${car.imei}" 
+              class="bg-button-primary text-white px-6 py-2 rounded-md hover:bg-button-primary-hover transition-colors disabled:bg-button-primary-disabled disabled:cursor-not-allowed"
+              data-imei="${car.imei}"
+              onclick="startUpgrade(this)"
+            >
+              开始升级
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 初始化车辆信息 DOM 元素
+    function initCarElements() {
+      const carsGrid = document.getElementById('upgrade-cars-grid');
+      cars.forEach((car, index) => {
+        carsGrid.innerHTML += createCarInfoHTML(car, index);
+        car.speedElement = document.getElementById(`upgrade-car-${car.imei}-speed`);
+        car.gearElement = document.getElementById(`upgrade-car-${car.imei}-gear`);
+        car.modeElement = document.getElementById(`upgrade-car-${car.imei}-mode`);
+        car.versionElement = document.getElementById(`upgrade-car-${car.imei}-version`);
+      });
+    }
+    // 处理文件选择
+    function handleFileSelect(event, imei) {
+        const inputElement = event.target;
+        const fileNameElement = document.getElementById(`selected-file-name-${imei}`);
+        const file = inputElement.files[0];
+
+        if (!file) {
+            selectedFiles[imei] = false;
+            const upgradeButton = document.getElementById(`start-upgrade-${imei}`);
+            if (upgradeButton) {
+                upgradeButton.disabled = true;
+            }
+            if (fileNameElement) {
+                fileNameElement.textContent = '';
+            }
+            console.log('未选择文件');
+            return;
+        }
+
+        const fileName = file.name;
+        console.log(`已选择文件，文件名称为: ${fileName}`);
+
+        // 将文件名称存储到 selectedFiles 对象中
+        selectedFiles[imei] = {
+            selected: true,
+            fileName: fileName
+        };
+
+        if (fileNameElement) {
+            fileNameElement.textContent = `已选择: ${fileName}`;
+        }
+
+        const upgradeButton = document.getElementById(`start-upgrade-${imei}`);
+        if (upgradeButton) {
+            upgradeButton.disabled = false;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('imei', imei);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/', true);
+
+        // 监听请求状态变化
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const contentType = xhr.getResponseHeader('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            console.log(data.message);
+                        } catch (parseError) {
+                            console.error('解析响应数据失败:', parseError);
+                        }
+                    } else {
+                        console.error('服务器返回非 JSON 数据:', xhr.responseText);
+                        // 上传失败，重置文件选择状态
+                        selectedFiles[imei] = {
+                            selected: false,
+                            fileName: ''
+                        };
+                        if (upgradeButton) {
+                            upgradeButton.disabled = true;
+                        }
+                        if (fileNameElement) {
+                            fileNameElement.textContent = '';
+                        }
+                    }
+                } else {
+                    console.error('文件上传失败，状态码:', xhr.status);
+                    // 上传失败，重置文件选择状态
+                    selectedFiles[imei] = {
+                        selected: false,
+                        fileName: ''
+                    };
+                    if (upgradeButton) {
+                        upgradeButton.disabled = true;
+                    }
+                    if (fileNameElement) {
+                        fileNameElement.textContent = '';
+                    }
+                }
+                // 请求完成后重置 input 元素的值
+                inputElement.value = ''; 
+            }
+        };
+
+        // 监听请求错误
+        xhr.onerror = function() {
+            console.error('上传文件时发生网络错误');
+            // 发生错误，重置文件选择状态
+            selectedFiles[imei] = {
+                selected: false,
+                fileName: ''
+            };
+            if (upgradeButton) {
+                upgradeButton.disabled = true;
+            }
+            // 发生错误时重置 input 元素的值
+            inputElement.value = ''; 
+            if (fileNameElement) {
+                fileNameElement.textContent = '';
+            }
+        };
+        // 发送请求
+        console.log('发送文件上传请求');
+        xhr.send(formData);
+    }
+
+    // 开始升级函数
+    function startUpgrade(button) {
+        // 检查传入的按钮元素是否有效
+        if (!button) {
+            console.error('未传入有效的按钮元素');
+            return;
+        }
+        const imei = button.dataset.imei;
+        // 检查 imei 是否存在
+        if (!imei) {
+            console.error('未获取到有效的 IMEI 号');
+            return;
+        }
+        // 检查是否已选择文件
+        if (!selectedFiles[imei] || !selectedFiles[imei].selected) {
+            alert('请先选择升级文件');
+            return;
+        }
+
+        const fileName = selectedFiles[imei].fileName;
+
+        console.log(`开始升级车辆 ${imei} ，文件：${fileName}`);
+        if (upgradeStatus[imei]) return;
+
+        upgradeStatus[imei] = true;
+        try {
+            button.disabled = true;
+            button.textContent = '升级中...';
+        } catch (error) {
+            console.error(`设置按钮状态失败，IMEI: ${imei}`, error);
+        }
+
+        // 检查 WebSocket 连接状态
+        if (socket.readyState === WebSocket.OPEN) {
+            // 构造要发送的消息，添加文件名称
+            const message = {
+                type: 'start_upgrade',
+                imei: imei,
+                fileName: fileName
+            };
+            // 将消息转换为 JSON 字符串并发送
+            socket.send(JSON.stringify(message));
+            console.log(`已发送升级请求，IMEI: ${imei}，文件名: ${fileName}`);
+        } else {
+            console.error('WebSocket 连接未打开，无法发送升级请求');
+            // 恢复按钮状态
+            upgradeStatus[imei] = false;
+            try {
+                button.disabled = false;
+                button.textContent = '开始升级';
+            } catch (error) {
+                console.error(`恢复按钮状态失败，IMEI: ${imei}`, error);
+            }
+        }
+
+        // 模拟 5 秒升级过程
+        // setTimeout(() => {
+        //   upgradeStatus[imei] = false;
+        //   try {
+        //     button.disabled = false;
+        //     button.textContent = '开始升级';
+        //   } catch (error) {
+        //     console.error(`恢复按钮状态失败，IMEI: ${imei}`, error);
+        //   }
+        //   alert(`车辆 ${imei} 升级完成！`);
+        // }, 5000);
+    }
+
+    // 更新车辆信息
+    function updateCarInfo(car) {
+      car.speedElement.textContent = car.speed;
+      car.gearElement.textContent = car.gear;
+      car.modeElement.textContent = car.mode;
+      car.versionElement.textContent = car.version;
+      // 更新图标
+      car.gearElement.previousElementSibling.previousElementSibling.querySelector('i').className = `fa ${gearIcons[car.gear]} text-green-500 text-lg`;
+      car.modeElement.previousElementSibling.previousElementSibling.querySelector('i').className = `fa ${modeIcons[car.mode]} text-orange-500 text-lg`;
+    }
+
+    // 模拟车辆信息变化
+    function simulateCarInfoUpdates() {
+      setInterval(() => {
+        cars.forEach(car => {
+          // 随机变化车速
+          car.speed = Math.max(30, Math.min(120, car.speed + (Math.random() * 10 - 5)));
+    
+          // 偶尔切换档位
+          if (Math.random() < 0.05) {
+            const gears = ['P', 'R', 'N', 'D', 'S'];
+            car.gear = gears[Math.floor(Math.random() * gears.length)];
+          }
+    
+          // 偶尔切换驾驶模式
+          if (Math.random() < 0.1) {
+            const modes = ['经济', '运动', '舒适', '雪地', '自动'];
+            car.mode = modes[Math.floor(Math.random() * modes.length)];
+          }
+    
+          // 更新显示
+          updateCarInfo(car);
+        });
+      }, 2000);
+    }
+
+    // 初始化系统升级页车辆信息
+    function initUpgradeCarInfo() {
+      initCarElements();
+      simulateCarInfoUpdates();
+    }
+
+    // 修改导航项点击事件
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+    
+        if (item.hasAttribute('data-toggle-subnav')) {
+          const subNav = item.nextElementSibling;
+          subNav.classList.toggle('open');
+          const icon = item.querySelector('i.fa');
+          icon.classList.toggle('fa-chevron-down');
+          icon.classList.toggle('fa-chevron-up');
+          return;
+        }
+    
+        // 更新导航项激活状态
+        navItems.forEach(nav => nav.classList.remove('nav-item-active'));
+        item.classList.add('nav-item-active');
+    
+        // 隐藏所有内容区域
+        const contentAreas = document.querySelectorAll('[id$="-content"]');
+        contentAreas.forEach(area => area.classList.add('hidden'));
+    
+        // 显示对应内容区域
+        const targetId = item.getAttribute('href').substring(1);
+        const targetContent = document.getElementById(`${targetId}-content`);
+        if (targetContent) {
+          targetContent.classList.remove('hidden');
+          // 添加淡入动画
+          setTimeout(() => {
+            targetContent.classList.add('fade-in');
+          }, 10);
+    
+          // 当进入系统升级页时初始化车辆信息
+          if (targetId === 'upgrade') {
+            // initUpgradeCarInfo();
+          }
+        }
+      });
+    });
+
+    // WebSocket 客户端部分
+    const socket = new WebSocket('ws://172.28.0.208:8080');
+
+    socket.addEventListener('open', () => {
+        console.log('WebSocket 连接已建立');
+        // 连接建立后，将所有车辆标记为在线
+        cars.forEach(car => {
+            const onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+            if (onlineStatusElement) {
+                onlineStatusElement.classList.remove('bg-gray-400');
+                onlineStatusElement.classList.add('bg-green-500');
+            }
+        });
+    });
+
+    socket.addEventListener('error', (error) => {
+        console.error('WebSocket 发生错误:', error);
+        // 发生错误后，将所有车辆标记为离线
+        cars.forEach(car => {
+            const onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+            if (onlineStatusElement) {
+                onlineStatusElement.classList.remove('bg-green-500');
+                onlineStatusElement.classList.add('bg-gray-400');
+            }
+        });
+    });
+
+    socket.addEventListener('close', (event) => {
+        console.log('WebSocket 连接已关闭，关闭代码:', event.code, '关闭原因:', event.reason);
+        // 连接关闭后，将所有车辆标记为离线
+        cars.forEach(car => {
+            const onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+            if (onlineStatusElement) {
+                onlineStatusElement.classList.remove('bg-green-500');
+                onlineStatusElement.classList.add('bg-gray-400');
+            }
+        });
+    });
+
+    socket.addEventListener('message', (event) => {
+        try {
+            const newCarData = JSON.parse(event.data);
+            console.log('收到 WebSocket 消息:', newCarData);
+            if (newCarData.type === 'vehicle_online') {
+                // 记录最后一次收到在线数据的时间
+                lastOnlineTime[newCarData.imei] = Date.now();
+
+                // 检查该 imei 的车辆是否已存在
+                const existingCar = cars.find(car => car.imei === newCarData.imei);
+                if (!existingCar) {
+                    const newCar = {
+                        id: cars.length + 1,
+                        speed: newCarData.speed || 0,
+                        gear: newCarData.gear || 'P',
+                        mode: newCarData.mode || '自动',
+                        version: newCarData.version || '1.0.0',
+                        imei: newCarData.imei,
+                        speedElement: null,
+                        gearElement: null,
+                        modeElement: null,
+                        versionElement: null
+                    };
+                    cars.push(newCar);
+                    const carsGrid = document.getElementById('upgrade-cars-grid');
+                    const index = cars.length - 1;
+                    carsGrid.innerHTML += createCarInfoHTML(newCar, index);
+                    newCar.speedElement = document.getElementById(`upgrade-car-${newCar.imei}-speed`);
+                    newCar.gearElement = document.getElementById(`upgrade-car-${newCar.imei}-gear`);
+                    newCar.modeElement = document.getElementById(`upgrade-car-${newCar.imei}-mode`);
+                    newCar.versionElement = document.getElementById(`upgrade-car-${newCar.imei}-version`);
+
+                    // 新车辆上线，标记为在线
+                    const newCarOnlineStatusElement = document.getElementById(`car-${newCar.imei}-online-status`);
+                    if (newCarOnlineStatusElement) {
+                        newCarOnlineStatusElement.classList.remove('bg-gray-400');
+                        newCarOnlineStatusElement.classList.add('bg-green-500');
+                    }
+                }
+            } else if (newCarData.type === 'upgrade_complete') { 
+                const imei = newCarData.imei;
+                const upgradeButton = document.getElementById(`start-upgrade-${imei}`);
+                if (upgradeButton) {
+                    upgradeStatus[imei] = false;
+                    try {
+                        upgradeButton.disabled = false;
+                        upgradeButton.textContent = '开始升级';
+                    } catch (error) {
+                        console.error(`恢复按钮状态失败，IMEI: ${imei}`, error);
+                    }
+                    alert(`车辆 ${imei} 升级完成！`);
+                }
+            }
+        } catch (error) {
+            console.error('解析 WebSocket 消息出错:', error);
+        }
+    });
+
+    // 定时器，每 1 秒检查一次
+    setInterval(() => {
+        const now = Date.now();
+        cars.slice().forEach((car, index) => {
+            const lastTime = lastOnlineTime[car.imei];
+            if (lastTime && now - lastTime > 5000) {
+            // if (lastTime && now - lastTime > 50000) {
+                    // 超过 5 秒没收到在线数据，删除车辆信息
+                const carsGrid = document.getElementById('upgrade-cars-grid');
+                const carElement = document.querySelector(`[id^="car-${car.imei}-"]`).closest('.rounded-lg');
+                if (carElement) {
+                    carsGrid.removeChild(carElement);
+                }
+                // 从 cars 数组中移除该车辆
+                cars.splice(index, 1);
+                // 从 lastOnlineTime 中移除该车辆记录
+                delete lastOnlineTime[car.imei];
+                // 从 selectedFiles 中移除该车辆记录
+                if (selectedFiles[car.imei]) {
+                    delete selectedFiles[car.imei];
+                }
+                // 从 upgradeStatus 中移除该车辆记录
+                if (upgradeStatus[car.imei]) {
+                    delete upgradeStatus[car.imei];
+                }
+            }
+        });
+    }, 1000);
+
+    socket.addEventListener('close', () => {
+        console.log('WebSocket 连接已关闭');
+        // 连接关闭后，将所有车辆标记为离线
+        cars.forEach(car => {
+            const onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+            if (onlineStatusElement) {
+                onlineStatusElement.classList.remove('bg-green-500');
+                onlineStatusElement.classList.add('bg-gray-400');
+            }
+        });
+    });
+
+    socket.addEventListener('error', (error) => {
+        console.error('WebSocket 发生错误:', error);
+        // 发生错误后，将所有车辆标记为离线
+        cars.forEach(car => {
+            const onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+            if (onlineStatusElement) {
+                onlineStatusElement.classList.remove('bg-green-500');
+                onlineStatusElement.classList.add('bg-gray-400');
+            }
+        });
+    });
+  </script>
+</body>
+</html>    
