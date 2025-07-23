@@ -1,5 +1,5 @@
 #!/bin/bash
-docker_name="lk2"
+docker_name="lk1"
 local_path=$(cd "$(dirname "$0")";pwd)
 docker_path="/${local_path##*/}"
 

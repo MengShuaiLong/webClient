@@ -117,13 +117,25 @@
                 <li class="mb-1">
                   <a href="#settings-sub1" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
                     <i class="fa fa-angle-right w-6"></i>
-                    <span class="ml-3">通信模块</span>
+                    <span class="ml-3">基础信息配置</span>
                   </a>
                 </li>
                 <li class="mb-1">
                   <a href="#settings-sub2" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
                     <i class="fa fa-angle-right w-6"></i>
-                    <span class="ml-3">感知模块</span>
+                    <span class="ml-3">感知模块配置</span>
+                  </a>
+                </li>
+                <li class="mb-1">
+                  <a href="#settings-sub3" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                    <i class="fa fa-angle-right w-6"></i>
+                    <span class="ml-3">通信模块配置</span>
+                  </a>
+                </li>
+                <li class="mb-1">
+                  <a href="#settings-sub4" class="nav-item flex items-center px-4 py-3 rounded-lg text-gray-300 nav-item-hover">
+                    <i class="fa fa-angle-right w-6"></i>
+                    <span class="ml-3">规控模块配置</span>
                   </a>
                 </li>
               </ul>
@@ -637,7 +649,7 @@
     });
 
     // WebSocket 客户端部分
-    const socket = new WebSocket('ws://172.28.0.208:8080');
+    const socket = new WebSocket('ws://172.28.0.135:8080');
 
     socket.addEventListener('open', () => {
         console.log('WebSocket 连接已建立');
