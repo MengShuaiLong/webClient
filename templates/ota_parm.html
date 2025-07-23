@@ -567,13 +567,35 @@
 
     // 更新车辆信息
     function updateCarInfo(car) {
-      car.speedElement.textContent = car.speed;
-      car.gearElement.textContent = car.gear;
-      car.modeElement.textContent = car.mode;
-      car.versionElement.textContent = car.version;
-      // 更新图标
-      car.gearElement.previousElementSibling.previousElementSibling.querySelector('i').className = `fa ${gearIcons[car.gear]} text-green-500 text-lg`;
-      car.modeElement.previousElementSibling.previousElementSibling.querySelector('i').className = `fa ${modeIcons[car.mode]} text-orange-500 text-lg`;
+      // 确保元素存在再更新内容
+      if (car.speedElement) {
+        car.speedElement.textContent = car.speed;
+      }
+      if (car.gearElement) {
+        car.gearElement.textContent = car.gear;
+        // 检查元素是否存在再调用 querySelector
+        const gearIconElement = car.gearElement.previousElementSibling.previousElementSibling;
+        if (gearIconElement) {
+          const gearIcon = gearIconElement.querySelector('i');
+          if (gearIcon) {
+            gearIcon.className = `fa ${gearIcons[car.gear]} text-green-500 text-lg`;
+          }
+        }
+      }
+      if (car.modeElement) {
+        car.modeElement.textContent = car.mode;
+        // 检查元素是否存在再调用 querySelector
+        const modeIconElement = car.modeElement.previousElementSibling.previousElementSibling;
+        if (modeIconElement) {
+          const modeIcon = modeIconElement.querySelector('i');
+          if (modeIcon) {
+            modeIcon.className = `fa ${modeIcons[car.mode]} text-orange-500 text-lg`;
+          }
+        }
+      }
+      if (car.versionElement) {
+        car.versionElement.textContent = car.version;
+      }
     }
 
     // 模拟车辆信息变化
@@ -599,12 +621,6 @@
           updateCarInfo(car);
         });
       }, 2000);
-    }
-
-    // 初始化系统升级页车辆信息
-    function initUpgradeCarInfo() {
-      initCarElements();
-      simulateCarInfoUpdates();
     }
 
     // 修改导航项点击事件
@@ -642,7 +658,7 @@
     
           // 当进入系统升级页时初始化车辆信息
           if (targetId === 'upgrade') {
-            // initUpgradeCarInfo();
+            initUpgradeCarInfo();
           }
         }
       });
@@ -725,6 +741,13 @@
                         newCarOnlineStatusElement.classList.remove('bg-gray-400');
                         newCarOnlineStatusElement.classList.add('bg-green-500');
                     }
+                } else {
+                    // 更新现有车辆信息
+                    existingCar.speed = newCarData.speed || existingCar.speed;
+                    existingCar.gear = newCarData.gear || existingCar.gear;
+                    existingCar.mode = newCarData.mode || existingCar.mode;
+                    existingCar.version = newCarData.version || existingCar.version;
+                    updateCarInfo(existingCar);
                 }
             } else if (newCarData.type === 'upgrade_complete') { 
                 const imei = newCarData.imei;
