@@ -74,9 +74,20 @@
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease-in-out;
+        /* 隐藏滚动条（适用于 Chrome、Safari 和 Opera） */
+        &::-webkit-scrollbar {
+          display: none;
+        }
+        /* 隐藏滚动条（适用于 Firefox） */
+        scrollbar-width: none;
+      }
+      /* 隐藏滚动条（适用于 Internet Explorer 和 Edge） */
+      .sub-nav {
+        -ms-overflow-style: none;
       }
       .sub-nav.open {
         max-height: 500px; /* 可根据实际子导航项数量调整 */
+        overflow-y: auto; /* 当内容超出时显示垂直滚动条（虽然已隐藏） */
       }
     }
   </style>
@@ -160,7 +171,7 @@
     <!-- 主内容区 -->
     <main class="flex-1 overflow-y-auto bg-gray-50 ml-64">
       <!-- 顶部操作栏 -->
-      <div class="bg-white shadow-sm sticky top-0 z-10">
+      <!-- <div class="bg-white shadow-sm sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <h2 class="text-lg font-semibold text-gray-900">系统升级</h2>
           <div class="flex items-center space-x-4">
@@ -178,7 +189,7 @@
             </button>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- 内容区域 -->
       <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -237,6 +248,50 @@
           </div>
         </div>
         
+        <!-- 基础信息配置内容区域 -->
+        <div id="settings-sub1-content" class="hidden fade-in">
+          <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
+            <!-- 将选择配置项、写入按钮放在同一行 -->
+            <div class="flex items-center mb-4 space-x-4 border-b-2 border-blue-200 pb-4">
+              <div class="flex-1">
+                <label for="basic-config-select" class="block text-sm font-medium text-gray-700">车辆编号</label>
+                <!-- 修改 select 元素的样式类 -->
+                <select id="basic-config-select" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-blue-100 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <option value="dnh123">NULL</option>
+                  <!-- 可按需添加更多选项 -->
+                  <!-- <option value="option2">其他选项 2</option> -->
+                  <!-- <option value="option3">其他选项 3</option> -->
+                </select>
+              </div>
+              <div class="flex space-x-4">
+                <button id="write-btn" class="bg-button-primary text-white px-4 py-2 rounded-md hover:bg-button-primary-hover transition-colors" onclick="sendConfigInfo()">
+                  写入
+                </button>
+              </div>
+            </div>
+            <!-- 将串口名称和波特率放在同一行 -->
+            <div class="flex items-end mb-4 space-x-4">
+              <div class="flex-1">
+                <label for="serial-port" class="block text-sm font-medium text-gray-700">串口名称</label>
+                <input type="text" id="serial-port" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入串口名称">
+              </div>
+              <div class="flex-1">
+                <label for="baud-rate" class="block text-sm font-medium text-gray-700">波特率</label>
+                <input type="number" id="baud-rate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入波特率">
+              </div>
+            </div>
+            <!-- 新增 IP 地址输入框 -->
+            <div class="mb-4">
+              <label for="ip-address" class="block text-sm font-medium text-gray-700">IP 地址</label>
+              <input type="text" id="ip-address" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 IP 地址">
+            </div>
+            <!-- 新增端口输入框 -->
+            <div class="mb-4">
+              <label for="port" class="block text-sm font-medium text-gray-700">端口</label>
+              <input type="number" id="port" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入端口号">
+            </div>
+          </div>
+        </div>
         <!-- 其他内容区域可以继续添加 -->
       </div>
     </main>
@@ -623,45 +678,50 @@
       }, 2000);
     }
 
+    // 初始化系统升级页的车辆信息
+    function initUpgradeCarInfo() {
+        initCarElements();
+    }
+
     // 修改导航项点击事件
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-    
-        if (item.hasAttribute('data-toggle-subnav')) {
-          const subNav = item.nextElementSibling;
-          subNav.classList.toggle('open');
-          const icon = item.querySelector('i.fa');
-          icon.classList.toggle('fa-chevron-down');
-          icon.classList.toggle('fa-chevron-up');
-          return;
-        }
-    
-        // 更新导航项激活状态
-        navItems.forEach(nav => nav.classList.remove('nav-item-active'));
-        item.classList.add('nav-item-active');
-    
-        // 隐藏所有内容区域
-        const contentAreas = document.querySelectorAll('[id$="-content"]');
-        contentAreas.forEach(area => area.classList.add('hidden'));
-    
-        // 显示对应内容区域
-        const targetId = item.getAttribute('href').substring(1);
-        const targetContent = document.getElementById(`${targetId}-content`);
-        if (targetContent) {
-          targetContent.classList.remove('hidden');
-          // 添加淡入动画
-          setTimeout(() => {
-            targetContent.classList.add('fade-in');
-          }, 10);
-    
-          // 当进入系统升级页时初始化车辆信息
-          if (targetId === 'upgrade') {
-            initUpgradeCarInfo();
-          }
-        }
-      });
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (item.hasAttribute('data-toggle-subnav')) {
+                const subNav = item.nextElementSibling;
+                subNav.classList.toggle('open');
+                const icon = item.querySelector('i.fa');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+                return;
+            }
+
+            // 更新导航项激活状态
+            navItems.forEach(nav => nav.classList.remove('nav-item-active'));
+            item.classList.add('nav-item-active');
+
+            // 隐藏所有内容区域
+            const contentAreas = document.querySelectorAll('[id$="-content"]');
+            contentAreas.forEach(area => area.classList.add('hidden'));
+
+            // 显示对应内容区域
+            const targetId = item.getAttribute('href').substring(1);
+            const targetContent = document.getElementById(`${targetId}-content`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                // 添加淡入动画
+                setTimeout(() => {
+                    targetContent.classList.add('fade-in');
+                }, 10);
+
+                // 当进入系统升级页时初始化车辆信息
+                if (targetId === 'upgrade') {
+                    initUpgradeCarInfo();
+                }
+            }
+        });
     });
 
     // WebSocket 客户端部分
@@ -703,20 +763,179 @@
         });
     });
 
-    socket.addEventListener('message', (event) => {
+    // 防抖函数，减少频繁更新 DOM
+    // function debounce(func, delay) {
+    //   let timer;
+    //   return function(...args) {
+    //     clearTimeout(timer);
+    //     timer = setTimeout(() => {
+    //       func.apply(this, args);
+    //     }, delay);
+    //   };
+    // }
+
+    // 缓存车辆信息 DOM 元素的辅助函数
+    function cacheCarElements(car) {
+      car.speedElement = document.getElementById(`upgrade-car-${car.imei}-speed`);
+      car.gearElement = document.getElementById(`upgrade-car-${car.imei}-gear`);
+      car.modeElement = document.getElementById(`upgrade-car-${car.imei}-mode`);
+      car.versionElement = document.getElementById(`upgrade-car-${car.imei}-version`);
+      car.onlineStatusElement = document.getElementById(`car-${car.imei}-online-status`);
+
+      console.log(`车辆 ${car.imei} 元素缓存情况：`, {
+        speedElement: car.speedElement,
+        gearElement: car.gearElement,
+        modeElement: car.modeElement,
+        versionElement: car.versionElement,
+        onlineStatusElement: car.onlineStatusElement
+      });
+    }
+
+    // 更新单个车辆信息
+    function updateSingleCarInfo(car) {
+      try {
+        const updateDOM = () => {
+          if (car.speedElement) {
+            const speed = parseFloat(car.speed);
+            if (!isNaN(speed)) {
+              car.speedElement.textContent = speed.toFixed(1);
+              console.log(`车辆 ${car.imei} 车速更新为：${speed.toFixed(1)}`);
+            } else {
+              console.error(`车辆 ${car.imei} 车速数据无效：${car.speed}`);
+            }
+          } else {
+            console.error(`车辆 ${car.imei} 车速元素未找到，无法更新车速信息`);
+          }
+
+          if (car.gearElement) {
+            car.gearElement.textContent = car.gear;
+            const gearIconContainer = car.gearElement.closest('.flex-shrink-0');
+            if (gearIconContainer) {
+              const gearIconElement = gearIconContainer.querySelector('i');
+              if (gearIconElement) {
+                gearIconElement.className = `fa ${gearIcons[car.gear]} text-green-500 text-lg`;
+              }
+            }
+          }
+
+          if (car.modeElement) {
+            car.modeElement.textContent = car.mode;
+            const modeIconContainer = car.modeElement.closest('.flex-shrink-0');
+            if (modeIconContainer) {
+              const modeIconElement = modeIconContainer.querySelector('i');
+              if (modeIconElement) {
+                modeIconElement.className = `fa ${modeIcons[car.mode]} text-orange-500 text-lg`;
+              }
+            }
+          }
+
+          if (car.versionElement) {
+            car.versionElement.textContent = car.version;
+          }
+
+          if (car.onlineStatusElement) {
+            const lastTime = lastOnlineTime[car.imei];
+            const now = Date.now();
+            const isOnline = lastTime && now - lastTime <= 5000;
+            car.onlineStatusElement.classList.toggle('bg-green-500', isOnline);
+            car.onlineStatusElement.classList.toggle('bg-gray-400', !isOnline);
+          }
+        };
+
+        // 使用 requestAnimationFrame 优化 DOM 更新
+        requestAnimationFrame(updateDOM);
+      } catch (error) {
+        console.error(`更新车辆 ${car.imei} 信息时出错:`, error);
+      }
+    }
+
+    // 防抖更新车辆信息
+    // const debouncedUpdateCarInfo = debounce(updateSingleCarInfo, 100);
+
+    // 更新车辆选择下拉框选项
+    function updateCarSelectOptions() {
+        const selectElement = document.getElementById('basic-config-select');
+        if (!selectElement) {
+            console.error('未找到车辆选择下拉框元素');
+            return;
+        }
+        // 清空现有选项
+        selectElement.innerHTML = '';
+
+        if (cars.length === 0) {
+            // 若没有车辆，添加 NULL 选项
+            const nullOption = document.createElement('option');
+            nullOption.value = 'NULL';
+            nullOption.textContent = 'NULL';
+            selectElement.appendChild(nullOption);
+        } else {
+            // 添加新选项
+            cars.forEach(car => {
+                const option = document.createElement('option');
+                option.value = car.imei;
+                option.textContent = `车辆 - ${car.imei}`;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // 移除旧的事件监听器，避免重复绑定
+        selectElement.removeEventListener('change', handleCarSelect);
+        // 为下拉列表添加 change 事件监听器
+        selectElement.addEventListener('change', handleCarSelect);
+    }
+
+    // 处理车辆选择事件
+    function handleCarSelect(event) {
+        const imei = event.target.value;
+        // 检查 WebSocket 连接状态
+        if (socket.readyState === WebSocket.CONNECTING) {
+            // 如果正在连接，等待连接成功后再发送消息
+            socket.addEventListener('open', () => {
+                sendCarConfigRequest(imei);
+            }, { once: true });
+        } else if (socket.readyState === WebSocket.OPEN) {
+            sendCarConfigRequest(imei);
+        } else {
+            console.error('WebSocket 连接未打开，无法发送请求车辆信息');
+            alert('WebSocket 连接未打开，请稍后重试');
+        }
+    }
+
+    // 封装发送车辆配置请求的函数
+    function sendCarConfigRequest(imei) {
+        // 构造要发送的消息
+        const message = {
+            type: 'request_car_conf',
+            imei: imei
+        };
+        // 将消息转换为 JSON 字符串并发送
+        socket.send(JSON.stringify(message));
+        console.log(`已发送请求车辆信息，IMEI: ${imei}`);
+    }
+
+    // 封装 WebSocket 消息处理函数
+    function handleWebSocketMessage(event) {
         try {
             const newCarData = JSON.parse(event.data);
             console.log('收到 WebSocket 消息:', newCarData);
+
             if (newCarData.type === 'vehicle_online') {
-                // 记录最后一次收到在线数据的时间
+                if (!newCarData.imei) {
+                    console.error('收到的 vehicle_online 消息缺少 imei 字段');
+                    return;
+                }
+                if (newCarData.speed !== undefined && isNaN(parseFloat(newCarData.speed))) {
+                    console.error(`车辆 ${newCarData.imei} 的 speed 字段不是有效的数字:`, newCarData.speed);
+                    return;
+                }
+
                 lastOnlineTime[newCarData.imei] = Date.now();
 
-                // 检查该 imei 的车辆是否已存在
                 const existingCar = cars.find(car => car.imei === newCarData.imei);
                 if (!existingCar) {
                     const newCar = {
                         id: cars.length + 1,
-                        speed: newCarData.speed || 0,
+                        speed: newCarData.speed !== undefined ? parseFloat(newCarData.speed) : 0,
                         gear: newCarData.gear || 'P',
                         mode: newCarData.mode || '自动',
                         version: newCarData.version || '1.0.0',
@@ -724,30 +943,42 @@
                         speedElement: null,
                         gearElement: null,
                         modeElement: null,
-                        versionElement: null
+                        versionElement: null,
+                        onlineStatusElement: null
                     };
                     cars.push(newCar);
                     const carsGrid = document.getElementById('upgrade-cars-grid');
                     const index = cars.length - 1;
                     carsGrid.innerHTML += createCarInfoHTML(newCar, index);
-                    newCar.speedElement = document.getElementById(`upgrade-car-${newCar.imei}-speed`);
-                    newCar.gearElement = document.getElementById(`upgrade-car-${newCar.imei}-gear`);
-                    newCar.modeElement = document.getElementById(`upgrade-car-${newCar.imei}-mode`);
-                    newCar.versionElement = document.getElementById(`upgrade-car-${newCar.imei}-version`);
+                    cacheCarElements(newCar);
 
-                    // 新车辆上线，标记为在线
-                    const newCarOnlineStatusElement = document.getElementById(`car-${newCar.imei}-online-status`);
-                    if (newCarOnlineStatusElement) {
-                        newCarOnlineStatusElement.classList.remove('bg-gray-400');
-                        newCarOnlineStatusElement.classList.add('bg-green-500');
+                    if (newCar.onlineStatusElement) {
+                        newCar.onlineStatusElement.classList.remove('bg-gray-400');
+                        newCar.onlineStatusElement.classList.add('bg-green-500');
                     }
+                    // 调用更新下拉列表选项的函数
+                    updateCarSelectOptions();
                 } else {
-                    // 更新现有车辆信息
-                    existingCar.speed = newCarData.speed || existingCar.speed;
-                    existingCar.gear = newCarData.gear || existingCar.gear;
-                    existingCar.mode = newCarData.mode || existingCar.mode;
-                    existingCar.version = newCarData.version || existingCar.version;
-                    updateCarInfo(existingCar);
+                    if (newCarData.speed !== undefined) {
+                        const speed = parseFloat(newCarData.speed);
+                        if (!isNaN(speed)) {
+                            existingCar.speed = speed;
+                            console.log(`车辆 ${existingCar.imei} 接收到新的车速数据：${speed}`);
+                        } else {
+                            console.error(`车辆 ${existingCar.imei} 接收到无效的车速数据：${newCarData.speed}`);
+                        }
+                    }
+                    if (newCarData.gear !== undefined) {
+                        existingCar.gear = newCarData.gear;
+                    }
+                    if (newCarData.mode !== undefined) {
+                        existingCar.mode = newCarData.mode;
+                    }
+                    if (newCarData.version !== undefined) {
+                        existingCar.version = newCarData.version;
+                    }
+                    // 直接调用更新车辆信息函数
+                    updateSingleCarInfo(existingCar);
                 }
             } else if (newCarData.type === 'upgrade_complete') { 
                 const imei = newCarData.imei;
@@ -762,20 +993,48 @@
                     }
                     alert(`车辆 ${imei} 升级完成！`);
                 }
+            } else if (newCarData.type === 'car_conf_response') {
+                console.log('msl WebSocket 消息:');
+                const imei = newCarData.imei;
+
+                // 将获取到的信息显示在对应位置
+                const serialPortInput = document.getElementById('serial-port');
+                const baudRateInput = document.getElementById('baud-rate');
+                const ipAddressInput = document.getElementById('ip-address');
+                const portInput = document.getElementById('port');
+
+                if (serialPortInput) {
+                    // 直接从 newCarData 中获取 serialPort 字段
+                    serialPortInput.value = newCarData.serialPort || '';
+                }
+                if (baudRateInput) {
+                    // 直接从 newCarData 中获取 baudRate 字段
+                    baudRateInput.value = newCarData.baudRate || '';
+                }
+                if (ipAddressInput) {
+                    // 直接从 newCarData 中获取 ipAddress 字段
+                    ipAddressInput.value = newCarData.ipAddress || '';
+                }
+                if (portInput) {
+                    // 直接从 newCarData 中获取 port 字段
+                    portInput.value = newCarData.port || '';
+                }
             }
         } catch (error) {
             console.error('解析 WebSocket 消息出错:', error);
         }
-    });
+    }
+
+    socket.addEventListener('message', handleWebSocketMessage);
 
     // 定时器，每 1 秒检查一次
     setInterval(() => {
         const now = Date.now();
-        cars.slice().forEach((car, index) => {
+        // 使用 slice() 复制数组，避免在遍历过程中修改原数组导致的索引问题
+        cars.slice().forEach((car, index) => { 
             const lastTime = lastOnlineTime[car.imei];
             if (lastTime && now - lastTime > 5000) {
-            // if (lastTime && now - lastTime > 50000) {
-                    // 超过 5 秒没收到在线数据，删除车辆信息
+                // 超过 5 秒没收到在线数据，删除车辆信息
                 const carsGrid = document.getElementById('upgrade-cars-grid');
                 const carElement = document.querySelector(`[id^="car-${car.imei}-"]`).closest('.rounded-lg');
                 if (carElement) {
@@ -793,6 +1052,8 @@
                 if (upgradeStatus[car.imei]) {
                     delete upgradeStatus[car.imei];
                 }
+                // 调用更新下拉列表选项的函数
+                updateCarSelectOptions();
             }
         });
     }, 1000);
@@ -820,6 +1081,44 @@
             }
         });
     });
+
+    // 模拟车辆信息变化（测试用，实际使用可移除）
+    // simulateCarInfoUpdates();
+
+    // 发送配置信息到 WebSocket 服务端
+    function sendConfigInfo() {
+      // 检查 WebSocket 连接状态
+      if (socket.readyState !== WebSocket.OPEN) {
+        console.error('WebSocket 连接未打开，无法发送配置信息');
+        alert('WebSocket 连接未打开，无法发送配置信息');
+        return;
+      }
+
+      // 获取车辆编号
+      const carSelect = document.getElementById('basic-config-select');
+      const selectedCar = carSelect.value;
+
+      // 获取配置信息
+      const serialPort = document.getElementById('serial-port').value;
+      const baudRate = document.getElementById('baud-rate').value;
+      const ipAddress = document.getElementById('ip-address').value;
+      const port = document.getElementById('port').value;
+
+      // 构造要发送的消息
+      const message = {
+        type: 'request_write_config',
+        imei: selectedCar,
+        serialPort: serialPort,
+        baudRate: parseInt(baudRate, 10),
+        ipAddress: ipAddress,
+        port: parseInt(port, 10)
+      };
+
+      // 发送消息
+      socket.send(JSON.stringify(message));
+      console.log('已发送配置信息:', message);
+      alert('配置信息已发送');
+    }
   </script>
 </body>
-</html>    
+</html>
