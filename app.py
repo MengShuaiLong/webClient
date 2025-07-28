@@ -58,7 +58,7 @@ def upload_file():
 
     try:
         # 尝试渲染指定模板
-        return render_template('ota_parm_.html')
+        return render_template('ota_parm.html')
     except TemplateNotFound:
         # 若模板文件不存在，返回 JSON 错误响应
         error_msg = "未找到 'ota_parm.html' 模板文件，请检查文件是否存在。"
