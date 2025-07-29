@@ -617,6 +617,19 @@
 
         const fileName = selectedFiles[imei].fileName;
 
+        // 查找对应车辆信息
+        const car = cars.find(c => c.imei === imei);
+        if (!car) {
+            console.error(`未找到 IMEI 为 ${imei} 的车辆信息`);
+            return;
+        }
+
+        // 车辆状态判断
+        if (car.mode !== '人工驾驶' || car.speed !== 0 || car.gear !== 'P') {
+            alert('状态不满足，仅在车辆处于人工驾驶、车速为 0 且档位为 P 档时才允许升级');
+            return;
+        }
+
         console.log(`开始升级车辆 ${imei} ，文件：${fileName}`);
         if (upgradeStatus[imei]) return;
 
@@ -1191,8 +1204,8 @@
       const envId = document.getElementById('env-id').value;
       const minioAddress = document.getElementById('minio-address').value;
       const minioPort = document.getElementById('minio-port').value;
-      const accessKey = document.getElementById('access_key').value;
-      const secretKey = document.getElementById('secret_key').value;
+      const accessKey = document.getElementById('access-key').value;
+      const secretKey = document.getElementById('secret-key').value;
 
       // 构造要发送的消息
       const message = {
