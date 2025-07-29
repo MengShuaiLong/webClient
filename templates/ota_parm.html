@@ -272,7 +272,7 @@
             <!-- 将串口名称、波特率、IP 地址和端口放在同一行 -->
             <div class="flex items-end mb-4 space-x-4">
               <div class="flex-1">
-                <label for="ip-address" class="block text-sm font-medium text-gray-700">IP 地址</label>
+                <label for="ip-address" class="block text-sm font-medium text-gray-700">Cloud 地址</label>
                 <input type="text" id="ip-address" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 IP 地址">
               </div>
               <div class="flex-1">
@@ -282,13 +282,34 @@
               <!-- 垂直分割线 -->
               <div class="border-l border-gray-300 h-14"></div>
               <div class="flex-1">
-                <label for="serial-port" class="block text-sm font-medium text-gray-700">串口名称</label>
-                <input type="text" id="serial-port" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入串口名称">
+                <label for="vehicle-imei" class="block text-sm font-medium text-gray-700">车辆 IMEI</label>
+                <input type="text" id="vehicle-imei" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入车辆 IMEI">
               </div>
               <div class="flex-1">
-                <label for="baud-rate" class="block text-sm font-medium text-gray-700">波特率</label>
-                <input type="number" id="baud-rate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入波特率">
+                <label for="env-id" class="block text-sm font-medium text-gray-700">env id</label>
+                <input type="text" id="env-id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 env id">
               </div>
+            </div>
+            <div class="flex items-end mb-4 space-x-4">
+              <div class="flex-1">
+                <label for="minio-address" class="block text-sm font-medium text-gray-700">MinIO 地址</label>
+                <input type="text" id="minio-address" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 MinIO 地址">
+              </div>
+              <div class="flex-1">
+                <label for="minio-port" class="block text-sm font-medium text-gray-700">端口</label>
+                <input type="number" id="minio-port" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 MinIO 端口号">
+              </div>
+              <!-- 垂直分割线 -->
+              <div class="border-l border-gray-300 h-14"></div>
+              <div class="flex-1">
+                <label for="access-key" class="block text-sm font-medium text-gray-700">access_key</label>
+                <input type="text" id="access-key" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 access_key">
+              </div>
+              <div class="flex-1">
+                <label for="secret-key" class="block text-sm font-medium text-gray-700">secret_key</label>
+                <input type="text" id="secret-key" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" placeholder="请输入 secret_key">
+              </div>
+
             </div>
             <!-- 删除重复的 IP 地址和端口输入框 -->
             <!--
@@ -1038,19 +1059,15 @@
                 const imei = newCarData.imei;
 
                 // 将获取到的信息显示在对应位置
-                const serialPortInput = document.getElementById('serial-port');
-                const baudRateInput = document.getElementById('baud-rate');
                 const ipAddressInput = document.getElementById('ip-address');
                 const portInput = document.getElementById('port');
+                const vehicleImeiInput = document.getElementById('vehicle-imei');
+                const envIdInput = document.getElementById('env-id');
+                const minioAddressInput = document.getElementById('minio-address');
+                const minioPortInput = document.getElementById('minio-port');
+                const accessKeyInput = document.getElementById('access-key');
+                const secretKeyInput = document.getElementById('secret-key');
 
-                if (serialPortInput) {
-                    // 直接从 newCarData 中获取 serialPort 字段
-                    serialPortInput.value = newCarData.serialPort || '';
-                }
-                if (baudRateInput) {
-                    // 直接从 newCarData 中获取 baudRate 字段
-                    baudRateInput.value = newCarData.baudRate || '';
-                }
                 if (ipAddressInput) {
                     // 直接从 newCarData 中获取 ipAddress 字段
                     ipAddressInput.value = newCarData.ipAddress || '';
@@ -1058,6 +1075,24 @@
                 if (portInput) {
                     // 直接从 newCarData 中获取 port 字段
                     portInput.value = newCarData.port || '';
+                }
+                if (vehicleImeiInput) {
+                    vehicleImeiInput.value = newCarData.vehicleImei || '';
+                }
+                if (envIdInput) {
+                    envIdInput.value = newCarData.envId || '';
+                }
+                if (minioAddressInput) {
+                    minioAddressInput.value = newCarData.minioAddress || '';
+                }
+                if (minioPortInput) {
+                    minioPortInput.value = newCarData.minioPort || '';
+                }
+                if (accessKeyInput) {
+                    accessKeyInput.value = newCarData.accessKey || '';
+                }
+                if (secretKeyInput) {
+                    secretKeyInput.value = newCarData.secretKey || '';
                 }
             }
         } catch (error) {
@@ -1150,19 +1185,27 @@
       const selectedCar = carSelect.value;
 
       // 获取配置信息
-      const serialPort = document.getElementById('serial-port').value;
-      const baudRate = document.getElementById('baud-rate').value;
       const ipAddress = document.getElementById('ip-address').value;
       const port = document.getElementById('port').value;
+      const vehicleImei = document.getElementById('vehicle-imei').value;
+      const envId = document.getElementById('env-id').value;
+      const minioAddress = document.getElementById('minio-address').value;
+      const minioPort = document.getElementById('minio-port').value;
+      const accessKey = document.getElementById('access_key').value;
+      const secretKey = document.getElementById('secret_key').value;
 
       // 构造要发送的消息
       const message = {
         type: 'request_write_config',
-        imei: selectedCar,
-        serialPort: serialPort,
-        baudRate: parseInt(baudRate, 10),
         ipAddress: ipAddress,
-        port: parseInt(port, 10)
+        port: parseInt(port, 10),
+        imei: selectedCar,
+        envId: envId,
+        accessKey: accessKey,
+        secretKey: secretKey,
+        minioAddress: minioAddress,
+        minioPort: parseInt(minioPort, 10),
+        vehicleImei: vehicleImei,
       };
 
       // 发送消息
